@@ -20,6 +20,7 @@ import {
     YAxis,
     LineChart,
     Line,
+    Label,
 } from "recharts";
 
 const Input = (props) => <Form.Control {...props} />;
@@ -51,6 +52,8 @@ const HEADER_ALIASES = {
   status: ["Case Status", "Status"],
   store: ["Store", "Purchase Location", "Retailer"],
   email: ["Email", "Consumer Email", "Customer Email"],
+  consumerName: ["Consumer Name"],
+  contactChannel: ["Contact Channel", "Channel"],
 };
 
 function normalizeHeaderName(name = "") {
@@ -93,6 +96,8 @@ function combineDateTime(dateStr, timeStr) {
 function runHeaderMappingTests() {
   const headers = [
     "Case ID (unique)",
+    "Consumer Name",
+    "Contact Channel",
     "Product",
     "Lot #",
     "Contact Date",
@@ -102,8 +107,10 @@ function runHeaderMappingTests() {
     "Store",
   ];
   console.assert(findHeaderKeyIndex(headers, HEADER_ALIASES.ticketId) === 0, "ticketId idx");
-  console.assert(findHeaderKeyIndex(headers, HEADER_ALIASES.product) === 1, "product idx");
-  console.assert(findHeaderKeyIndex(headers, HEADER_ALIASES.status) === 6, "status idx");
+  console.assert(findHeaderKeyIndex(headers, HEADER_ALIASES.consumerName) === 1, "consumerName idx");
+  console.assert(findHeaderKeyIndex(headers, HEADER_ALIASES.contactChannel) === 2, "contactChannel idx");
+  console.assert(findHeaderKeyIndex(headers, HEADER_ALIASES.product) === 3, "product idx");
+  console.assert(findHeaderKeyIndex(headers, HEADER_ALIASES.status) === 8, "status idx");
 }
 
 const COLORS = ["#f87171", "#60a5fa", "#facc15", "#34d399", "#a78bfa", "#f472b6"];
@@ -117,10 +124,71 @@ const SectionHeader = ({ title, desc }) => (
 
 export default function BanzaPOC() {
   const seedNow = Date.now();
+  const [selectedLevel1, setSelectedLevel1] = useState("");
+  const [selectedLevel2, setSelectedLevel2] = useState("");
+  const [selectedLevel3, setSelectedLevel3] = useState("");
+
+  const Level1Options = ["ProductOps", "MarketingOps", "ProductPackaging", "ProductNegativeSentiment"];
+  const Level2Options = {
+    ProductOps: ["Abnormal Aroma", "Abnormal Texture", "Box Fill", "Breakage", "Carton Fill", "Checking", "Cheese Pouch", 
+        "Foreign Material - Quality", "Foreign Material - Safety", "Illness", "Lot Code/Best By", "Missing Cheese Pouch",
+        "Mold", "Pests", "Quality - Pizza", "Quality - Pasta/Mac", "Quality - Waffles", "Seasoning Pouch", "Spotting/Air Bubbles"],
+    MarketingOps: ["Abnormal Aroma", "Abnormal Texture", "Box Fill", "Breakage", "Carton Fill", "Checking", "Cheese Pouch", 
+        "Foreign Material - Quality", "Foreign Material - Safety", "Illness", "Lot Code/Best By", "Missing Cheese Pouch",
+        "Mold", "Pests", "Quality - Pizza", "Quality - Pasta/Mac", "Quality - Waffles", "Seasoning Pouch", "Spotting/Air Bubbles"],
+    ProductPackaging: ["Abnormal Aroma", "Abnormal Texture", "Box Fill", "Breakage", "Carton Fill", "Checking", "Cheese Pouch", 
+        "Foreign Material - Quality", "Foreign Material - Safety", "Illness", "Lot Code/Best By", "Missing Cheese Pouch",
+        "Mold", "Pests", "Quality - Pizza", "Quality - Pasta/Mac", "Quality - Waffles", "Seasoning Pouch", "Spotting/Air Bubbles"],
+    ProductNegativeSentiment:["Abnormal Aroma", "Abnormal Texture", "Box Fill", "Breakage", "Carton Fill", "Checking", "Cheese Pouch", 
+        "Foreign Material - Quality", "Foreign Material - Safety", "Illness", "Lot Code/Best By", "Missing Cheese Pouch",
+        "Mold", "Pests", "Quality - Pizza", "Quality - Pasta/Mac", "Quality - Waffles", "Seasoning Pouch", "Spotting/Air Bubbles"]
+
+    };
+  const level3Options = ["Topping Shifted", "Ice Crystallization", "Splitting / Cracking", "Spoilage / Mold"];
   const seeded = [
+    // Real seeded rows from the provided Quality Tracker CSV (first two entries)
+    {
+      id: seedNow - 600000,
+      ticketId: "Q04532",
+      product: "Four Cheese Pizza",
+      lotCode: "4912924T2-1",
+      expiration: "",
+      location: "Walmart",
+      email: "",
+      complaint: "pizza toppings shifted, probing for more. nothing wrong with packaging.",
+      consumerName: "John Smith",
+      contactChannel: "Gorgias",
+      category: "Other",
+      status: "Resolved",
+      createdAt: new Date("2025-08-02T08:13:00Z").toISOString(),
+      timeline: [
+        { at: new Date("2025-08-02T08:13:00Z").toISOString(), note: "Imported from seed (CSV row)" },
+        { at: new Date("2025-08-02T08:13:00Z").toISOString(), note: "Status → Resolved" },
+      ],
+    },
+    {
+      id: seedNow - 550000,
+      ticketId: "Q04533",
+      product: "Rotini",
+      lotCode: "",
+      expiration: "",
+      location: "",
+      email: "",
+      complaint: "opened mac and cheese, was crawling with weevils. probing for more.",
+      consumerName: "Sally Baker",
+      contactChannel: "Gorgias",
+      category: "Quality",
+      status: "Resolved",
+      createdAt: new Date("2025-08-03T00:00:00Z").toISOString(),
+      timeline: [
+        { at: new Date("2025-08-03T00:00:00Z").toISOString(), note: "Imported from seed (CSV row)" },
+        { at: new Date("2025-08-03T00:00:00Z").toISOString(), note: "Status → Resolved" },
+      ],
+    },
+    // Demo rows
     {
       id: seedNow - 500000,
-      ticketId: "BAN-RTN-" + (seedNow - 500000).toString().slice(-4),
+      ticketId: "Q04577",
       product: "Chickpea Pasta Rotini",
       lotCode: "L240812A",
       expiration: "2025-12-01",
@@ -131,15 +199,12 @@ export default function BanzaPOC() {
       status: "Open",
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
       timeline: [
-        {
-          at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
-          note: "Complaint submitted",
-        },
+        { at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(), note: "Complaint submitted" },
       ],
     },
     {
       id: seedNow - 400000,
-      ticketId: "BAN-MAC-" + (seedNow - 400000).toString().slice(-4),
+      ticketId: "Q04596",
       product: "Chickpea Mac & Cheese",
       lotCode: "L240901C",
       expiration: "2025-11-20",
@@ -150,19 +215,13 @@ export default function BanzaPOC() {
       status: "In Progress",
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
       timeline: [
-        {
-          at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
-          note: "Complaint submitted",
-        },
-        {
-          at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6).toISOString(),
-          note: "Assigned to CX agent",
-        },
+        { at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(), note: "Complaint submitted" },
+        { at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 6).toISOString(), note: "Assigned to CX agent" },
       ],
     },
     {
       id: seedNow - 300000,
-      ticketId: "BAN-PCS-" + (seedNow - 300000).toString().slice(-4),
+      ticketId: "Q04356",
       product: "Pizza Crust",
       lotCode: "L240830B",
       expiration: "2025-10-15",
@@ -173,19 +232,13 @@ export default function BanzaPOC() {
       status: "Escalated",
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
       timeline: [
-        {
-          at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
-          note: "Complaint submitted",
-        },
-        {
-          at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2 + 3600000).toISOString(),
-          note: "Escalated to manufacturing partner (mock Slack)",
-        },
+        { at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), note: "Complaint submitted" },
+        { at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2 + 3600000).toISOString(), note: "Escalated to manufacturing partner (mock Slack)" },
       ],
     },
     {
       id: seedNow - 200000,
-      ticketId: "BAN-PEN-" + (seedNow - 200000).toString().slice(-4),
+      ticketId: "Q04565",
       product: "Penne",
       lotCode: "L240825A",
       expiration: "2025-09-30",
@@ -196,18 +249,9 @@ export default function BanzaPOC() {
       status: "Resolved",
       createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 9).toISOString(),
       timeline: [
-        {
-          at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 9).toISOString(),
-          note: "Complaint submitted",
-        },
-        {
-          at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 8).toISOString(),
-          note: "Replacement shipped",
-        },
-        {
-          at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
-          note: "Issue resolved",
-        },
+        { at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 9).toISOString(), note: "Complaint submitted" },
+        { at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 8).toISOString(), note: "Replacement shipped" },
+        { at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(), note: "Issue resolved" },
       ],
     },
   ];
@@ -388,6 +432,8 @@ export default function BanzaPOC() {
       status: findHeaderKeyIndex(headers, HEADER_ALIASES.status),
       store: findHeaderKeyIndex(headers, HEADER_ALIASES.store),
       email: findHeaderKeyIndex(headers, HEADER_ALIASES.email),
+      consumerName: findHeaderKeyIndex(headers, HEADER_ALIASES.consumerName),
+      contactChannel: findHeaderKeyIndex(headers, HEADER_ALIASES.contactChannel),
     };
 
     const imported = rows
@@ -408,6 +454,8 @@ export default function BanzaPOC() {
           location: String(toVal("store") || ""),
           email,
           complaint,
+          consumerName: String(toVal("consumerName") || ""),
+          contactChannel: String(toVal("contactChannel") || ""),
           category: categoryFromText(complaint),
           status,
           createdAt,
@@ -472,12 +520,51 @@ export default function BanzaPOC() {
               </select>
             </div>
             <div className="space-y-2">
+                <label className="text-sm font-medium">Level - 1</label>
+                <select className="border rounded p-2 w-full" value={selectedLevel1} onChange={e => {
+                    setSelectedLevel1(e.target.value);
+                    setSelectedLevel2(""); // Reset framework when language changes
+                }}>
+                <option value="">Select Level 1</option>
+                {Level1Options.map(lang => (
+                    <option key={lang} value={lang}>{lang}</option>
+                ))}
+                </select>
+            </div>
+            <div className="space-y-2">
+            <label className="text-sm font-medium">Level - 2</label>
+            <select
+                className="border rounded p-2 w-full"
+                value={selectedLevel2}
+                onChange={e => setSelectedLevel2(e.target.value)}
+            >
+                <option value="">Select Level 2</option>
+                {/* Flatten all Level2Options arrays and show all options */}
+                {Object.values(Level2Options).flat().map(fw => (
+                <option key={fw} value={fw}>{fw}</option>
+                ))}
+            </select>
+            </div>
+            <div className="space-y-2">
+            <label className="text-sm font-medium">Level - 3</label>
+            <select
+                className="border rounded p-2 w-full"
+                value={selectedLevel3}
+                onChange={e => setSelectedLevel3(e.target.value)}
+            >
+                <option value="">Select Level 3</option>
+                {level3Options.map(opt => (
+                <option key={opt} value={opt}>{opt}</option>
+                ))}
+            </select>
+            </div>
+            <div className="space-y-2">
               <label className="text-sm font-medium">Your Email</label>
               <Input type="email" placeholder="you@example.com" value={form.email} onChange={(e)=>setForm({...form, email: e.target.value})} required />
             </div>
             <div className="md:col-span-2 space-y-2">
               <label className="text-sm font-medium">Complaint Details</label>
-              <Input placeholder="Describe the issue (taste, packaging, delivery, etc.)" value={form.complaint} onChange={(e)=>setForm({...form, complaint: e.target.value})} required />
+              <Textarea placeholder="Describe the issue (taste, packaging, delivery, etc.)" value={form.complaint} onChange={(e)=>setForm({...form, complaint: e.target.value})} required />
             </div>
             <div className="md:col-span-2">
               <Button type="submit" className="w-full">Create Ticket</Button>
@@ -509,7 +596,13 @@ export default function BanzaPOC() {
                       <p><b>Status:</b> {found.status}</p>
                       <p><b>Product:</b> {found.product} | <b>Lot:</b> {found.lotCode}</p>
                       <p><b>Purchase Location:</b> {found.location}</p>
+                      <p><b>Consumer Name:</b> {found.consumerName || "—"}</p>
+                      <p><b>Contact Channel:</b> {found.contactChannel || "—"}</p>
                       <p><b>Category:</b> {found.category}</p>
+                      <div>
+                        <b>Case Description</b>
+                        <div className="whitespace-pre-wrap">{found.complaint}</div>
+                      </div>
                       <div>
                         <b>Timeline</b>
                         <ul className="list-disc pl-5">
@@ -530,18 +623,24 @@ export default function BanzaPOC() {
           {/* Internal inbox */}
           <Card className="p-4 lg:col-span-2">
             <SectionHeader title="Internal Inbox" desc="View and manage all complaints. Escalate to manufacturing partner when needed." />
-            <div className="flex flex-wrap gap-2 mb-3">
-              <select className="border rounded p-2" value={filters.status} onChange={(e)=>setFilters({...filters, status: e.target.value})}>
-                <option>All</option>
-                <option>Open</option>
-                <option>In Progress</option>
-                <option>Escalated</option>
-                <option>Resolved</option>
-              </select>
-              <select className="border rounded p-2" value={filters.product} onChange={(e)=>setFilters({...filters, product: e.target.value})}>
-                <option>All</option>
-                {products.map(p => <option key={p}>{p}</option>)}
-              </select>
+            <div className="flex flex-wrap gap-4 mb-3">
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium min-w-[60px]">Status</label>
+                <select className="border rounded p-2" value={filters.status} onChange={(e)=>setFilters({...filters, status: e.target.value})}>
+                  <option>All</option>
+                  <option>Open</option>
+                  <option>In Progress</option>
+                  <option>Escalated</option>
+                  <option>Resolved</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium min-w-[70px]">Product</label>
+                <select className="border rounded p-2" value={filters.product} onChange={(e)=>setFilters({...filters, product: e.target.value})}>
+                  <option>All</option>
+                  {products.map(p => <option key={p}>{p}</option>)}
+                </select>
+              </div>
             </div>
             <div className="grid gap-3 max-h-[520px] overflow-auto pr-1">
               {filteredComplaints.map((c) => (
@@ -549,7 +648,9 @@ export default function BanzaPOC() {
                   <CardContent className="space-y-2">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="text-sm">
-                        <div className="font-medium">{c.ticketId} — {c.product}</div>
+                        <div className="font-medium"><b>Case Id - </b> {c.ticketId}</div>
+                        <div className="font-medium"><b>Product - </b> {c.product}</div>
+                        <div className="text-gray-700"><b>Consumer:</b> {c.consumerName || "—"} • <b>Channel:</b> {c.contactChannel || "—"}</div>
                         <div className="text-gray-600">Lot {c.lotCode} • {c.location} • {new Date(c.createdAt).toLocaleString()}</div>
                         <div className=""><b>Category:</b> {c.category} • <b>Status:</b> {c.status}</div>
                       </div>
@@ -560,7 +661,7 @@ export default function BanzaPOC() {
                       </div>
                     </div>
                     <div className="text-sm text-gray-700">
-                      <b>Complaint:</b> {c.complaint}
+                      <b>Case Description:</b> {c.complaint}
                     </div>
                     <div className="text-xs">
                       <b>Timeline</b>
