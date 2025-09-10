@@ -9,6 +9,10 @@ function App() {
   return (
     <Router>
       <Routes>
+
+        {/* Customer sees only the complaint form */}
+        <Route path="/" element={<CustomerPortal />} />
+
         {/* Customer sees only the complaint form */}
         <Route path="/customer" element={<CustomerPortal />} />
 
