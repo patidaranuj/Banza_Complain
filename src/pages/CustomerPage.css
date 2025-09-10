@@ -1,0 +1,244 @@
+.customer-container {
+  font-family: Arial, sans-serif;
+  background: #f7f9fb;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.customer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fdf7f0;
+  padding: 16px 40px;
+  border-bottom: 1px solid #eee;
+}
+
+.customer-header .logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #f15a24;
+}
+
+.customer-header nav button {
+  margin-left: 15px;
+  background: none;
+  border: none;
+  font-size: 15px;
+  color: #f15a24;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.customer-header nav button:hover {
+  text-decoration: underline;
+}
+
+/* Main */
+.customer-main {
+  flex: 1;
+  padding: 30px 40px;
+}
+
+/* Form container */
+.form-container {
+  background: #fff;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  max-width: 800px;
+  margin: 0 auto;
+  height: 50%;
+}
+
+.form-container h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Inputs */
+.form-container label {
+  display: block;
+  margin-top: 8px;
+  margin-bottom: 3px;
+  font-weight: 500;
+}
+
+.form-container input,
+.form-container select,
+.form-container textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.form-container textarea {
+  min-height: 70px;
+}
+
+.form-container button {
+  margin-top: 20px;
+  background: #f15a24;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.form-container button:hover {
+  background: #d44c1e;
+}
+
+/* Track box */
+.track-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.track-box input {
+  flex: 1;
+}
+
+/* Ticket details */
+.ticket-details {
+  background: #fdf7f0;
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 6px;
+}
+
+.no-result {
+  margin-top: 10px;
+  color: red;
+}
+
+/* Footer */
+.customer-footer {
+  background: #ff3c00;
+  height: 50px;
+  margin-top: auto;
+}
+
+/* Ticket details card */
+.ticket-details {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-top: 15px;
+}
+
+.ticket-details h3 {
+  margin: 0 0 15px 0;
+  color: #f15a24;
+  font-size: 18px;
+}
+
+.ticket-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.ticket-meta p {
+  margin: 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.ticket-status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #fdf2e9;
+  color: #f15a24;
+}
+
+.form-row {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 0px;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.tag-btn {
+  padding: 4px 10px;      
+  border-radius: 12px;   
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px; 
+}
+
+.suggested-tag {
+  margin-bottom: 12px;
+  color: #888;
+  font-size: 15px;
+}
+
+.photo-upload-container {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.upload-photo-btn,
+.analyze-photo-btn {
+  padding: 10px 22px;
+  border: 2px solid #ff6a00;
+  border-radius: 24px;
+  background: #fff;
+  color: #ff6a00;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.tag-btn {
+  padding: 8px 18px;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  background: #fff;         /* <-- pure white background */
+  cursor: pointer;
+  font-size: 16px;
+  color: #222;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.tag-btn.selected {
+  background: #ff6a00;     /* <-- orange when selected */
+  color: #fff;
+  border-color: #ff6a00;
+}
+
+.customer-main {
+  flex: 1;
+  padding: 30px 40px;
+  /* Add background image */
+  /* background-image: url('/resources/banzabackground.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat; */
+}
